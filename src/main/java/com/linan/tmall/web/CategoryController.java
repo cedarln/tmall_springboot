@@ -45,6 +45,12 @@ public class CategoryController {//专门用来提供restful服务的控制器�
         return null; //删除成功，返回空串
     }
 
+    @GetMapping("/categories/{id}")
+    public Category get(@PathVariable("id")int id) throws Exception {
+        Category bean = categoryService.get(id);
+        return bean;
+    }
+
     public void saveOrUpdateImageFile(Category bean, MultipartFile image, HttpServletRequest request) throws Exception{
         File imageFolder = new File(request.getServletContext().getRealPath("img/category"));
         File file = new File(imageFolder, bean.getId()+".jpg");

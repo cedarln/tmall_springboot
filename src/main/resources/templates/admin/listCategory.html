@@ -57,6 +57,19 @@
                         $("#categoryPic").val('');
                         vue.file = null;
                     });
+                },
+                deleteBean: function (id) { //delete是保留字
+                    if (!checkDeleteLink()) { //弹框-是否删除
+                        return;
+                    }
+                    var url = this.uri + "/" + id;
+                    axios.delete(url).then(function(response){ //通过axios提交删除请求
+                        if (0!=response.data.length) { //REST规范：删除成功后返回空串
+                            alert(response.data)
+                        }else{
+                            vue.list(0);
+                        }
+                    });
                 }
             }
         });
@@ -99,7 +112,7 @@
                     <a :href="'admin_category_edit?id=' + bean.id "><span class="glyphicon glyphicon-edit"></span></a>
                 </td>
                 <td>
-                    <a href="#nowhere"  @click="deleteBean(bean.id)"><span class="   glyphicon glyphicon-trash"></span></a>
+                    <a href="#nowhere" @click="deleteBean(bean.id)"><span class="   glyphicon glyphicon-trash"></span></a>
                 </td>
             </tr>
             </tbody>

@@ -36,6 +36,15 @@ public class CategoryController {//专门用来提供restful服务的控制器�
         return bean;
     }
 
+    @DeleteMapping("/categories/{id}")
+    public String delete(@PathVariable("id")int id, HttpServletRequest request) throws Exception {
+        categoryService.delete(id);
+        File imageFolder = new File(request.getServletContext().getRealPath("img/category"));
+        File file = new File(imageFolder, id+".jpg");
+        file.delete();
+        return null; //删除成功，返回空串
+    }
+
     public void saveOrUpdateImageFile(Category bean, MultipartFile image, HttpServletRequest request) throws Exception{
         File imageFolder = new File(request.getServletContext().getRealPath("img/category"));
         File file = new File(imageFolder, bean.getId()+".jpg");

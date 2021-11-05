@@ -29,7 +29,5 @@ public class TestTmall {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 }

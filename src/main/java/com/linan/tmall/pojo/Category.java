@@ -12,12 +12,12 @@ import javax.persistence.*;
 // 在 jpa 工作过程中，就会创造代理类来继承 Category ，并添加 handler 和 hibernateLazyInitializer 这两个无须 json 化的属性，
 // 所以这里需要用 JsonIgnoreProperties 把这两个属性忽略掉
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Id //主键
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //自增
+    @Column(name = "id") //对应的数据库字段名为id
     int id;
 
-    String name;
+    String name; //没写说明对应的就是name
 
     public int getId() {
         return id;

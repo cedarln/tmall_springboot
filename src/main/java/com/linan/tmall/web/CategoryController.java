@@ -14,8 +14,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
-@RestController  //对每个方法返回值都直接转换为json格式的控制器
-public class CategoryController {//专门用来提供restful服务的控制器？
+@RestController  //对每个方法的返回值都直接转换为json对象（实际上返回的大多数都是Category）
+//如果返回集合（如List<Category>）则会返回一个数组
+public class CategoryController { //用来提供restful服务(一个前后端分离的标准)的控制层
     @Autowired
     CategoryService categoryService;
 
@@ -48,6 +49,22 @@ public class CategoryController {//专门用来提供restful服务的控制器�
     @GetMapping("/categories/{id}")
     public Category get(@PathVariable("id")int id) throws Exception {
         Category bean = categoryService.get(id);
+        return bean;
+    }
+
+    @PutMapping("/categories/{id}")
+    public Object update(
+            MultipartFile image,
+            Category bean,
+            HttpServletRequest request
+    ) throws Exception {
+//        String name = request.getParameter("name");
+//        bean.setName(name);
+        System.out.println("update, new name is " + bean.getName());
+        categoryService.update(bean);
+        if(image!=null) {
+            saveOrUpdateImageFile(bean, image, request);
+        }
         return bean;
     }
 

@@ -12,21 +12,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service //业务层
 public class CategoryService {
     @Autowired
     CategoryDAO categoryDAO;  //自动装配到底是啥意思
+    //Spring运行后，会将此对象自动绑定到某一实例，动态绑定
 
-    public Page4Navigator<Category> list(int start, int size, int navigatePages) {
+    public Page4Navigator<Category> list(int start, int size, int navigatePages) { //带分页的业务方法，查询所有category
         System.out.println("start="+start+",size="+size);
-        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Sort sort = new Sort(Sort.Direction.DESC, "id"); //DESC倒叙，ASC为正序
         Pageable pageable = new PageRequest(start, size, sort);
         Page pageFromJPA = categoryDAO.findAll(pageable);
 
         return new Page4Navigator<>(pageFromJPA, navigatePages);
     }
 
-    public List<Category> list() {
+    public List<Category> list() { //业务方法-查询
         Sort sort = new Sort(Sort.Direction.DESC, "id");
         return categoryDAO.findAll(sort);
     }
@@ -42,5 +43,9 @@ public class CategoryService {
     public Category get(int id) {
         Category c = categoryDAO.findOne(id);
         return c;
+    }
+
+    public void update(Category bean) {
+        categoryDAO.save(bean);
     }
 }

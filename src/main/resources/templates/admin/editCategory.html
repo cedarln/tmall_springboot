@@ -37,7 +37,8 @@
                     var formData = new FormData();
                     formData.append("image", this.file);
                     formData.append("name", this.bean.name);
-                    axios.put(url, formData).then(function(response){
+                    console.log("TAG linan name: " + this.bean.name);
+                    axios.put(url, formData).then(function(response){ //REST规范，增加是post，修改是put
                         location.href = vue.listURL;
                     });
                 },
@@ -65,7 +66,7 @@
             <table class="editTable">
                 <tr>
                     <td>分类名称</td>
-                    <td><input @keyup.enter="update" v-model.trim="bean,name" type="text" class="form-control"/></td>
+                    <td><input @keyup.enter="update" v-model.trim="bean.name" type="text" class="form-control"/></td>
                 </tr>
                 <tr>
                     <td>分类图片</td>

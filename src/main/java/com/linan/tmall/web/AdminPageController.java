@@ -24,7 +24,6 @@ public class AdminPageController { //用来处理跳转的控制层
     @GetMapping(value="/admin_order_list")
     public String listOrder(){
         return "admin/listOrder";
-
     }
 
     @GetMapping(value="/admin_product_list")
@@ -59,12 +58,10 @@ public class AdminPageController { //用来处理跳转的控制层
     @GetMapping(value="/admin_propertyValue_edit")
     public String editPropertyValue(){
         return "admin/editPropertyValue";
-
     }
 
     @GetMapping(value="/admin_user_list")
     public String listUser(){
         return "admin/listUser";
-
     }
 }

@@ -2,6 +2,7 @@ package com.linan.tmall.web;
  
 import com.linan.tmall.pojo.Product;
 import com.linan.tmall.service.CategoryService;
+import com.linan.tmall.service.ProductImageService;
 import com.linan.tmall.service.ProductService;
 import com.linan.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,12 @@ import java.util.Date;
   
 @RestController
 public class ProductController {
-    @Autowired ProductService productService;
-    @Autowired CategoryService categoryService;
+    @Autowired
+    ProductService productService;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    ProductImageService productImageService;
      
     @GetMapping("/categories/{cid}/products")
     public Page4Navigator<Product> list(
@@ -23,6 +28,7 @@ public class ProductController {
     ) throws Exception {
         start = start<0 ? 0:start;
         Page4Navigator<Product> page = productService.list(cid, start, size,5 );
+        productImageService.setFirstProdutImages(page.getContent());//把图片设置上去
         return page;
     }
 

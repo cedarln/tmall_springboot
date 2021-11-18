@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -42,17 +43,29 @@ public class ForeRESTController {
         name = HtmlUtils.htmlEscape(name);
         user.setName(name);
         boolean exist = userService.isExist(name);
-
         if(exist){
             String message ="用户名已经被使用,不能使用";
             return Result.fail(message);
         }
-
         user.setPassword(password);
-
         userService.add(user);
 
         return Result.success();
     }
 
+    @PostMapping("/forelogin")
+    public Object login(@RequestBody User userParam, HttpSession session) {
+        String name =  userParam.getName();
+        name = HtmlUtils.htmlEscape(name);
+
+        User user =userService.get(name, userParam.getPassword());
+        if(null==user){
+            String message ="账号密码错误";
+            return Result.fail(message);
+        }
+        else{
+            session.setAttribute("user", user);
+            return Result.success();
+        }
+    }
 }

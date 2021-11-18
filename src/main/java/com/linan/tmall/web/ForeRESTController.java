@@ -1,22 +1,17 @@
 package com.linan.tmall.web;
 
-import com.linan.tmall.pojo.Category;
-import com.linan.tmall.pojo.Product;
-import com.linan.tmall.pojo.User;
-import com.linan.tmall.service.CategoryService;
-import com.linan.tmall.service.ProductService;
-import com.linan.tmall.service.UserService;
+import com.linan.tmall.pojo.*;
+import com.linan.tmall.service.*;
 import com.linan.tmall.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ForeRESTController {
@@ -26,6 +21,14 @@ public class ForeRESTController {
     ProductService productService;
     @Autowired
     UserService userService;
+    @Autowired
+    ProductImageService productImageService;
+    @Autowired
+    PropertyValueService propertyValueService;
+    @Autowired
+    OrderItemService orderItemService;
+    @Autowired
+    ReviewService reviewService;
 
     @GetMapping("/forehome")
     public Object home() {
@@ -43,13 +46,13 @@ public class ForeRESTController {
         name = HtmlUtils.htmlEscape(name);
         user.setName(name);
         boolean exist = userService.isExist(name);
+
         if(exist){
             String message ="用户名已经被使用,不能使用";
             return Result.fail(message);
         }
         user.setPassword(password);
         userService.add(user);
-
         return Result.success();
     }
 
@@ -58,7 +61,7 @@ public class ForeRESTController {
         String name =  userParam.getName();
         name = HtmlUtils.htmlEscape(name);
 
-        User user =userService.get(name, userParam.getPassword());
+        User user =userService.get(name,userParam.getPassword());
         if(null==user){
             String message ="账号密码错误";
             return Result.fail(message);
@@ -67,5 +70,27 @@ public class ForeRESTController {
             session.setAttribute("user", user);
             return Result.success();
         }
+    }
+
+    @GetMapping("/foreproduct/{pid}")
+    public Object product(@PathVariable("pid") int pid) {
+        Product product = productService.get(pid);
+
+        List<ProductImage> productSingleImages = productImageService.listSingleProductImages(product);
+        List<ProductImage> productDetailImages = productImageService.listDetailProductImages(product);
+        product.setProductSingleImages(productSingleImages);
+        product.setProductDetailImages(productDetailImages);
+
+        List<PropertyValue> pvs = propertyValueService.list(product);
+        List<Review> reviews = reviewService.list(product);
+        productService.setSaleAndReviewNumber(product);
+        productImageService.setFirstProdutImage(product);
+
+        Map<String,Object> map= new HashMap<>();
+        map.put("product", product);
+        map.put("pvs", pvs);
+        map.put("reviews", reviews);
+
+        return Result.success(map);
     }
 }

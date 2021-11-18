@@ -19,9 +19,16 @@ import java.util.List;
 @Service
 public class ProductService  {
 
-    @Autowired ProductDAO productDAO;
-    @Autowired CategoryService categoryService;
-    @Autowired ProductImageService productImageService;
+    @Autowired
+    ProductDAO productDAO;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    ProductImageService productImageService;
+    @Autowired
+    OrderItemService orderItemService;
+    @Autowired
+    ReviewService reviewService;
 
     public void add(Product bean) {
         productDAO.save(bean);
@@ -63,10 +70,10 @@ public class ProductService  {
         for (Category category : categorys) {
             List<Product> products =  category.getProducts();
             List<List<Product>> productsByRow =  new ArrayList<>();
-            for (int i = 0; i < products.size(); i += productNumberEachRow) {
-                int size = i + productNumberEachRow;
-                size = size > products.size() ? products.size():size;
-                List<Product> productsOfEachRow = products.subList(i, size);
+            for (int i = 0; i < products.size(); i+=productNumberEachRow) {
+                int size = i+productNumberEachRow;
+                size= size>products.size()?products.size():size;
+                List<Product> productsOfEachRow =products.subList(i, size);
                 productsByRow.add(productsOfEachRow);
             }
             category.setProductsByRow(productsByRow);
@@ -77,4 +84,16 @@ public class ProductService  {
         return productDAO.findByCategoryOrderById(category);
     }
 
+    public void setSaleAndReviewNumber(Product product) {
+        int saleCount = orderItemService.getSaleCount(product);
+        product.setSaleCount(saleCount);
+
+        int reviewCount = reviewService.getCount(product);
+        product.setReviewCount(reviewCount);
+    }
+
+    public void setSaleAndReviewNumber(List<Product> products) {
+        for (Product product : products)
+            setSaleAndReviewNumber(product);
+    }
 }

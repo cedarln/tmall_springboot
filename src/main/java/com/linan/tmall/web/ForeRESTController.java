@@ -111,7 +111,7 @@ public class ForeRESTController {
         productService.setSaleAndReviewNumber(c.getProducts());
         categoryService.removeCategoryFromProduct(c);
 
-        if(null != sort) {
+        if (null != sort) {
             Collections.sort(c.getProducts(), new ProductComparator(sort));
         }
 //        if (null != sort) {
@@ -134,5 +134,15 @@ public class ForeRESTController {
 //            }
 //        }
         return c;
+    }
+
+    @PostMapping("foresearch")
+    public Object search(String keyword) {
+        if (null == keyword)
+            keyword = "";
+        List<Product> ps = productService.search(keyword, 0, 20);
+        productImageService.setFirstProdutImages(ps);
+        productService.setSaleAndReviewNumber(ps);
+        return ps;
     }
 }

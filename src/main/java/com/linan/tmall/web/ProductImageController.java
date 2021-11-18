@@ -48,7 +48,12 @@ public class ProductImageController {
     }
      
     @PostMapping("/productImages")
-    public Object add(@RequestParam("pid") int pid, @RequestParam("type") String type, MultipartFile image, HttpServletRequest request) throws Exception {
+    public Object add(
+            @RequestParam("pid") int pid,
+            @RequestParam("type") String type,
+            MultipartFile image,
+            HttpServletRequest request
+    ) throws Exception {
         ProductImage bean = new ProductImage();
         Product product = productService.get(pid);
         bean.setProduct(product);

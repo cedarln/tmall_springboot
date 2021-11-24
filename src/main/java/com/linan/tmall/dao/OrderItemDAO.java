@@ -12,4 +12,5 @@ import com.linan.tmall.pojo.User;
 public interface OrderItemDAO extends JpaRepository<OrderItem,Integer>{
     List<OrderItem> findByOrderOrderByIdDesc(Order order);
     List<OrderItem> findByProduct(Product product);
+    List<OrderItem> findByUserAndOrderIsNull(User user);
 }

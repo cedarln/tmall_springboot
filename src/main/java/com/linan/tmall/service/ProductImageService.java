@@ -1,6 +1,7 @@
 package com.linan.tmall.service;
  
 import com.linan.tmall.dao.ProductImageDAO;
+import com.linan.tmall.pojo.OrderItem;
 import com.linan.tmall.pojo.Product;
 import com.linan.tmall.pojo.ProductImage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,10 @@ public class ProductImageService   {
         for (Product product : products)
             setFirstProdutImage(product);
     }
- 
+
+    public void setFirstProductImagesOnOrderItems(List<OrderItem> ois) {
+        for (OrderItem orderItem : ois) {
+            setFirstProdutImage(orderItem.getProduct());
+        }
+    }
 }

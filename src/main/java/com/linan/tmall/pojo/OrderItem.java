@@ -43,6 +43,7 @@ public class OrderItem {
         this.number = number;
     }
     public Product getProduct() {
+        System.out.println("OrderItem getProduct: " + product);
         return product;
     }
     public void setProduct(Product product) {

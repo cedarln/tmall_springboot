@@ -10,7 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
- 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
  
 @Service
@@ -23,6 +25,7 @@ public class OrderService {
     public static final String delete = "delete";  
      
     @Autowired OrderDAO orderDAO;
+    @Autowired OrderItemService orderItemService;
      
     public Page4Navigator<Order> list(int start, int size, int navigatePages) {
         Sort sort = new Sort(Sort.Direction.DESC, "id");
@@ -51,5 +54,23 @@ public class OrderService {
     public void update(Order bean) {
         orderDAO.save(bean);
     }
- 
+
+    @Transactional(propagation= Propagation.REQUIRED, rollbackForClassName="Exception")
+    public float add(Order order, List<OrderItem> ois) {
+        float total = 0;
+        add(order);
+
+        if(false)
+            throw new RuntimeException();
+
+        for (OrderItem oi: ois) {
+            oi.setOrder(order);
+            orderItemService.update(oi);
+            total+=oi.getProduct().getPromotePrice()*oi.getNumber();
+        }
+        return total;
+    }
+    public void add(Order order) {
+        orderDAO.save(order);
+    }
 }

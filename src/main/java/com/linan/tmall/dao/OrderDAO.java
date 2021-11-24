@@ -8,4 +8,5 @@ import com.linan.tmall.pojo.Order;
 import com.linan.tmall.pojo.User;
  
 public interface OrderDAO extends JpaRepository<Order,Integer>{
+    public List<Order> findByUserAndStatusNotOrderByIdDesc(User user, String status);
 }

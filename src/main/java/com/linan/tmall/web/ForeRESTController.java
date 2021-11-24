@@ -250,20 +250,20 @@ public class ForeRESTController {
     }
 
     @PostMapping("forecreateOrder")
-    public Object createOrder(@RequestBody Order order,HttpSession session){
-        User user =(User)session.getAttribute("user");
-        if(null==user)
+    public Object createOrder(@RequestBody Order order, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (null == user)
             return Result.fail("未登录");
         String orderCode = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + RandomUtils.nextInt(10000);
         order.setOrderCode(orderCode);
         order.setCreateDate(new Date());
         order.setUser(user);
         order.setStatus(OrderService.waitPay);
-        List<OrderItem> ois= (List<OrderItem>)  session.getAttribute("ois");
+        List<OrderItem> ois = (List<OrderItem>) session.getAttribute("ois");
 
-        float total = orderService.add(order,ois);
+        float total = orderService.add(order, ois);
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("oid", order.getId());
         map.put("total", total);
 
@@ -277,5 +277,16 @@ public class ForeRESTController {
         order.setPayDate(new Date());
         orderService.update(order);
         return order;
+    }
+
+    @GetMapping("forebought")
+    public Object bought(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (null == user) {
+            return Result.fail("未登录");
+        }
+        List<Order> os = orderService.listByUserWithoutDelete(user);
+        orderService.removeOrderFromOrderItem(os);
+        return os;
     }
 }

@@ -177,14 +177,14 @@ public class ForeRESTController {
     }
 
     @GetMapping("forebuy")
-    public Object buy(String[] oiid, HttpSession session){
+    public Object buy(String[] oiid, HttpSession session) {
         List<OrderItem> orderItems = new ArrayList<>();
         float total = 0;
 
         for (String strid : oiid) {
             int id = Integer.parseInt(strid);
-            OrderItem oi= orderItemService.get(id);
-            total +=oi.getProduct().getPromotePrice()*oi.getNumber();
+            OrderItem oi = orderItemService.get(id);
+            total += oi.getProduct().getPromotePrice() * oi.getNumber();
 
 //            Product product=oi.getProduct();
 //            float price=product.getPromotePrice();
@@ -198,7 +198,7 @@ public class ForeRESTController {
 
         session.setAttribute("ois", orderItems);
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("orderItems", orderItems);
         map.put("total", total);
         return Result.success(map);
@@ -206,15 +206,42 @@ public class ForeRESTController {
 
     @GetMapping("foreaddCart")
     public Object addCart(int pid, int num, HttpSession session) {
-        buyoneAndAddCart(pid,num,session);
+        buyoneAndAddCart(pid, num, session);
         return Result.success();
     }
 
     @GetMapping("forecart")
     public Object cart(HttpSession session) {
-        User user =(User)session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         List<OrderItem> ois = orderItemService.listByUser(user);
         productImageService.setFirstProductImagesOnOrderItems(ois);
         return ois;
+    }
+
+    @GetMapping("forechangeOrderItem")
+    public Object changeOrderItem(HttpSession session, int pid, int num) {
+        User user = (User) session.getAttribute("user");
+        if (null == user)
+            return Result.fail("未登录");
+
+        List<OrderItem> ois = orderItemService.listByUser(user);
+        for (OrderItem oi : ois) {
+            if (oi.getProduct().getId() == pid) {
+                oi.setNumber(num);
+                orderItemService.update(oi);
+                break;
+            }
+        }
+        return Result.success();
+    }
+
+    @GetMapping("foredeleteOrderItem")
+    public Object deleteOrderItem(HttpSession session, int oiid) {
+        User user = (User) session.getAttribute("user");
+        if (null == user) {
+            return Result.fail("未登录");
+        }
+        orderItemService.delete(oiid);
+        return Result.success();
     }
 }

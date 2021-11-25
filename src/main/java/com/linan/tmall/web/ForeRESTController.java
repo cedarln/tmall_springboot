@@ -289,4 +289,33 @@ public class ForeRESTController {
         orderService.removeOrderFromOrderItem(os);
         return os;
     }
+
+    @GetMapping("foreconfirmPay")
+    public Object confirmPay(int oid) {
+        Order o = orderService.get(oid);
+        orderItemService.fill(o);//为订单填充订单项
+        orderService.cacl(o);
+        orderService.removeOrderFromOrderItem(o);//为订单项移除订单，避免重复递归
+        return o;
+    }
+
+    @GetMapping("foreorderConfirmed")
+    public Object orderConfirmed(int oid) {
+        Order o = orderService.get(oid);
+        o.setStatus(OrderService.waitReview);
+        o.setConfirmDate(new Date());
+        orderService.update(o);
+        return Result.success();
+    }
+
+    @PutMapping("foredeleteOrder")
+    public Object deleteOrder(int oid) {
+        System.out.println("11111111111");
+        Order o = orderService.get(oid);
+        System.out.println("22222222222");
+        o.setStatus(OrderService.delete);
+        System.out.println("33333333333");
+        orderService.update(o);
+        return Result.success();
+    }
 }

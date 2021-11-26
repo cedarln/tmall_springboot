@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import com.linan.tmall.pojo.User;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jasper.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -44,12 +45,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         String uri = httpServletRequest.getRequestURI();
 
-        uri = StringUtils.remove(uri, contextPath + "/");
+        uri = StringUtils.remove(uri, contextPath + "/");//去掉请求链接里的  'tmall_springboot/'
         String page = uri;
 
         if (beginWith(page, requireAuthPages)) {
-            User user = (User) session.getAttribute("user");
-            if (user == null) {
+//            User user = (User) session.getAttribute("user");
+//            if (user == null) {
+            Subject subject = SecurityUtils.getSubject();
+            if (!subject.isAuthenticated()) {
                 httpServletResponse.sendRedirect("login");
                 return false;
             }

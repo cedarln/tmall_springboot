@@ -5,14 +5,22 @@ import com.linan.tmall.pojo.*;
 import com.linan.tmall.service.*;
 import com.linan.tmall.util.Result;
 import org.apache.commons.lang.math.RandomUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.apache.shiro.subject.Subject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static org.apache.shiro.web.filter.mgt.DefaultFilter.user;
 
 @RestController
 public class ForeRESTController {
@@ -55,23 +63,49 @@ public class ForeRESTController {
             String message = "用户名已经被使用,不能使用";
             return Result.fail(message);
         }
-        user.setPassword(password);
+
+        //---------add for shiro start
+        String salt = new SecureRandomNumberGenerator().nextBytes().toString();
+        int time = 2;
+        String algorithmName = "md5";
+        String encodedPassword = new SimpleHash(algorithmName, password, salt, time).toString();
+
+        user.setSalt(salt);
+//        user.setPassword(password);
+        user.setPassword(encodedPassword); //如果设置明文密码会报错java.lang.IllegalArgumentException: Odd number of characters
+        //---------add for shiro end
+
         userService.add(user);
         return Result.success();
     }
 
     @PostMapping("/forelogin")
     public Object login(@RequestBody User userParam, HttpSession session) {
+        //获取要登录的name和password
         String name = userParam.getName();
         name = HtmlUtils.htmlEscape(name);
 
-        User user = userService.get(name, userParam.getPassword());
-        if (null == user) {
-            String message = "账号密码错误";
-            return Result.fail(message);
-        } else {
+//        //到数据库里查询是否存在此User，不得不说JPA还是很方便的
+////        User user = userService.get(name, userParam.getPassword());
+//        if (null == user) {
+//            String message = "账号密码错误";
+//            return Result.fail(message);
+//        } else {
+//            session.setAttribute("user", user);
+//            return Result.success();
+//        }
+
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken(name, userParam.getPassword());
+        try {
+            subject.login(token);
+            User user = userService.getByName(name);
+            subject.getSession().setAttribute("user", user);
             session.setAttribute("user", user);
             return Result.success();
+        } catch (AuthenticationException e) {
+            String message = "wrong account or password.";
+            return Result.fail(message);
         }
     }
 
@@ -99,9 +133,12 @@ public class ForeRESTController {
 
     @GetMapping("forecheckLogin")
     public Object checkLogin(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (null != user)
+//        User user = (User) session.getAttribute("user");
+//        if (null != user){
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
             return Result.success();
+        }
         return Result.fail("未登录");
     }
 
@@ -327,7 +364,7 @@ public class ForeRESTController {
         Product p = o.getOrderItems().get(0).getProduct();
         List<Review> reviews = reviewService.list(p);
         productService.setSaleAndReviewNumber(p);
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("p", p);
         map.put("o", o);
         map.put("reviews", reviews);
@@ -336,7 +373,7 @@ public class ForeRESTController {
     }
 
     @PostMapping("foredoreview")
-    public Object doreview( HttpSession session,int oid,int pid,String content) {
+    public Object doreview(HttpSession session, int oid, int pid, String content) {
         Order o = orderService.get(oid);
         o.setStatus(OrderService.finish);
         orderService.update(o);
@@ -344,7 +381,7 @@ public class ForeRESTController {
         Product p = productService.get(pid);
         content = HtmlUtils.htmlEscape(content);
 
-        User user =(User)  session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         Review review = new Review();
         review.setContent(content);
         review.setProduct(p);

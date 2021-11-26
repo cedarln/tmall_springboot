@@ -1,9 +1,10 @@
 package com.linan.tmall.web;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class ForePageController {
@@ -89,6 +90,10 @@ public class ForePageController {
 
     @GetMapping("/forelogout") //这里的value=写不写都行，因为只有value，可以不用写
     public String logout( ) {
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isAuthenticated()) {
+            subject.logout();
+        }
         return "redirect:home";
     }
 

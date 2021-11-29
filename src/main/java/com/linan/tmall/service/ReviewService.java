@@ -13,6 +13,7 @@ import com.linan.tmall.pojo.Product;
 import com.linan.tmall.pojo.Review;
 
 @Service
+@CacheConfig(cacheNames = "reviews")
 public class ReviewService {
 
     @Autowired
@@ -20,15 +21,18 @@ public class ReviewService {
     @Autowired
     ProductService productService;
 
+    @CacheEvict(allEntries = true)
     public void add(Review review) {
         reviewDAO.save(review);
     }
 
+    @Cacheable(key = "'reviews-pid-' + #p0.id")
     public List<Review> list(Product product) {
         List<Review> result = reviewDAO.findByProductOrderByIdDesc(product);
         return result;
     }
 
+    @Cacheable(key = "'reviews-count-pid-' + #p0.id")
     public int getCount(Product product) {
         return reviewDAO.countByProduct(product);
     }

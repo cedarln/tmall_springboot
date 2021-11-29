@@ -6,7 +6,10 @@ import com.linan.tmall.pojo.Category;
 import com.linan.tmall.pojo.Product;
 import com.linan.tmall.pojo.Property;
 import com.linan.tmall.util.Page4Navigator;
+import com.linan.tmall.util.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Cacheable(cacheNames = "products")
 public class ProductService {
 
     @Autowired
@@ -30,22 +34,27 @@ public class ProductService {
     @Autowired
     ReviewService reviewService;
 
+    @CacheEvict(allEntries = true)
     public void add(Product bean) {
         productDAO.save(bean);
     }
 
+    @CacheEvict(allEntries = true)
     public void delete(int id) {
         productDAO.delete(id);
     }
 
+    @Cacheable(key = "'products-one-' + #p0")
     public Product get(int id) {
         return productDAO.findOne(id);
     }
 
+    @CacheEvict(allEntries = true)
     public void update(Product bean) {
         productDAO.save(bean);
     }
 
+    @Cacheable(key = "'products-cid-' + #p0 + '-page-' + #p1 + '-' + #p2")
     public Page4Navigator<Product> list(int cid, int start, int size, int navigatePages) {
         Category category = categoryService.get(cid);
         Sort sort = new Sort(Sort.Direction.DESC, "id");
@@ -61,7 +70,10 @@ public class ProductService {
     }
 
     public void fill(Category category) {
-        List<Product> products = listByCategory(category);
+        // 因为fill是非缓存的，所以springboot里调用listByCategory也不会使用redis缓存了，所以才做如下改造使其通过aop
+        ProductService productService = SpringContextUtil.getBean(ProductService.class);
+        List<Product> products = productService.listByCategory(category);
+//        List<Product> products = listByCategory(category);
         productImageService.setFirstProdutImages(products);
         category.setProducts(products);
     }
@@ -81,6 +93,7 @@ public class ProductService {
         }
     }
 
+    @Cacheable(key = "'products-cid-' + #p0")
     public List<Product> listByCategory(Category category) {
         return productDAO.findByCategoryOrderById(category);
     }

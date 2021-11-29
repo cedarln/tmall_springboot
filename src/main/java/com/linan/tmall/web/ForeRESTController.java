@@ -72,7 +72,7 @@ public class ForeRESTController {
 
         user.setSalt(salt);
 //        user.setPassword(password);
-        user.setPassword(encodedPassword); //如果设置明文密码会报错java.lang.IllegalArgumentException: Odd number of characters
+        user.setPassword(encodedPassword); //↑如果设置明文密码会报错java.lang.IllegalArgumentException: Odd number of characters
         //---------add for shiro end
 
         userService.add(user);

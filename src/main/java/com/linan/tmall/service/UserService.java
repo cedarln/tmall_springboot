@@ -28,12 +28,12 @@ public class UserService {
         return null != user;
     }
 
-    @Cacheable(key = "'users-one-name' + #p0")
+    @Cacheable(key = "'users-one-name-' + #p0")
     public User getByName(String name) {
         return userDAO.findByName(name);
     }
 
-    @Cacheable(key = "'users-one-name' + #p0 + '-password-' + #p1")
+    @Cacheable(key = "'users-one-name-' + #p0 + '-password-' + #p1")
     public User get(String name, String password) {
         return userDAO.getByNameAndPassword(name,password);
     }

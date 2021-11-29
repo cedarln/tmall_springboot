@@ -38,12 +38,12 @@ public class ProductImageService   {
         return productImageDAO.findOne(id);
     }
 
-    @Cacheable(key = "'productImages-single-pid' + #p0.id")
+    @Cacheable(key = "'productImages-single-pid-' + #p0.id")
     public List<ProductImage> listSingleProductImages(Product product) {
         return productImageDAO.findByProductAndTypeOrderByIdDesc(product, type_single);
     }
 
-    @Cacheable(key = "'productImages-detail-pid' + #p0.id")
+    @Cacheable(key = "'productImages-detail-pid-' + #p0.id")
     public List<ProductImage> listDetailProductImages(Product product) {
         return productImageDAO.findByProductAndTypeOrderByIdDesc(product, type_detail);
     }

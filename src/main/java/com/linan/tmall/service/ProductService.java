@@ -63,8 +63,8 @@ public class ProductService {
         return new Page4Navigator<>(pageFromJPA, navigatePages);
     }
 
-    public void fill(List<Category> categorys) {
-        for (Category category : categorys) {
+    public void fill(List<Category> categories) {
+        for (Category category : categories) {
             fill(category);
         }
     }
@@ -93,7 +93,7 @@ public class ProductService {
         }
     }
 
-    @Cacheable(key = "'products-cid-' + #p0")
+    @Cacheable(key = "'products-cid-' + #p0.id")
     public List<Product> listByCategory(Category category) {
         return productDAO.findByCategoryOrderById(category);
     }

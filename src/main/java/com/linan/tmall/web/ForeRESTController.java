@@ -121,7 +121,7 @@ public class ForeRESTController {
         List<PropertyValue> pvs = propertyValueService.list(product);
         List<Review> reviews = reviewService.list(product);
         productService.setSaleAndReviewNumber(product);
-        productImageService.setFirstProdutImage(product);
+        productImageService.setFirstProductImage(product);
 
         Map<String, Object> map = new HashMap<>();
         map.put("product", product);
@@ -179,7 +179,7 @@ public class ForeRESTController {
         if (null == keyword)
             keyword = "";
         List<Product> ps = productService.search(keyword, 0, 20);
-        productImageService.setFirstProdutImages(ps);
+        productImageService.setFirstProductImages(ps);
         productService.setSaleAndReviewNumber(ps);
         return ps;
     }

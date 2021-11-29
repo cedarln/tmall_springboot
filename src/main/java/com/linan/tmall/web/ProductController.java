@@ -28,7 +28,7 @@ public class ProductController {
     ) throws Exception {
         start = start<0 ? 0:start;
         Page4Navigator<Product> page = productService.list(cid, start, size,5 );
-        productImageService.setFirstProdutImages(page.getContent());//把图片设置上去
+        productImageService.setFirstProductImages(page.getContent());//把图片设置上去
         return page;
     }
 

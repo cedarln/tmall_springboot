@@ -40,7 +40,7 @@ public class OrderItemService {
         for (OrderItem oi : orderItems) {
             total += oi.getNumber() * oi.getProduct().getPromotePrice();
             totalNumber += oi.getNumber();
-            productImageService.setFirstProdutImage(oi.getProduct());
+            productImageService.setFirstProductImage(oi.getProduct());
         }
         order.setTotal(total);
         order.setOrderItems(orderItems);

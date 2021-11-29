@@ -8,6 +8,7 @@ import com.linan.tmall.pojo.Property;
 import com.linan.tmall.util.Page4Navigator;
 import com.linan.tmall.util.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Cacheable(cacheNames = "products")
+@CacheConfig(cacheNames = "products")
 public class ProductService {
 
     @Autowired
@@ -74,13 +75,13 @@ public class ProductService {
         ProductService productService = SpringContextUtil.getBean(ProductService.class);
         List<Product> products = productService.listByCategory(category);
 //        List<Product> products = listByCategory(category);
-        productImageService.setFirstProdutImages(products);
+        productImageService.setFirstProductImages(products);
         category.setProducts(products);
     }
 
-    public void fillByRow(List<Category> categorys) {
+    public void fillByRow(List<Category> categories) {
         int productNumberEachRow = 8;
-        for (Category category : categorys) {
+        for (Category category : categories) {
             List<Product> products = category.getProducts();
             List<List<Product>> productsByRow = new ArrayList<>();
             for (int i = 0; i < products.size(); i += productNumberEachRow) {

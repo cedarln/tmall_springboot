@@ -7,6 +7,7 @@ import com.linan.tmall.pojo.Product;
 import com.linan.tmall.pojo.User;
 import com.linan.tmall.util.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Cacheable(cacheNames = "orderItems")
+@CacheConfig(cacheNames = "orderItems")
 public class OrderItemService {
     @Autowired
     OrderItemDAO orderItemDAO;
